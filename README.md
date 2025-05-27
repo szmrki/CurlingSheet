@@ -15,8 +15,8 @@ cd CurlingSheet
 ### Create virtual environment
 ~~~cmd
 python -m venv .venv
-.venv\Scripts\activate.bat #cmd
-.\.venv\Scripts\Activate.ps1 #Powershell
+.venv\Scripts\activate.bat      #cmd
+.\.venv\Scripts\Activate.ps1    #Powershell
 (.venv) pip install -r requirements.txt
 ~~~
 

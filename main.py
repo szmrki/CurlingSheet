@@ -20,7 +20,7 @@ icon_path = resource_path("icon/icon.ico")
 class ColorDialog(QDialog):
     def __init__(self, parent):
         super().__init__()
-        self.setWindowTitle("ハウスカラーの変更")
+        self.setWindowTitle("ハウスの色の変更")
         self.setWindowIcon(QIcon(icon_path))
         self.setFixedSize(300, 120)
 
@@ -56,12 +56,12 @@ class ColorDialog(QDialog):
 class MainWindow(QWidget):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Curling Sheet")
+        self.setWindowTitle("CurlingSheet")
         self.setWindowIcon(QIcon(icon_path))
         self.setFixedSize(322, 830)
 
         self.sheet = Sheet()
-        self.button_change_color = self.__set_push_button("ハウスカラーの変更", self.change_color)
+        self.button_change_color = self.__set_push_button("ハウスの色の変更", self.change_color)
         self.button_add_red_stone = self.__set_push_button("赤ストーンを追加", self.add_red_stone_from_button)
         self.button_add_yellow_stone = self.__set_push_button("黄ストーンを追加", self.add_yellow_stone_from_button)
         self.button_save = self.__set_push_button("画像として保存", self.save_fig)
@@ -203,7 +203,7 @@ class MainWindow(QWidget):
             pos = sp.curlit_to_dc3(pos)
             file_path, _ = QFileDialog.getSaveFileName(
                 self,
-                "ストーン位置の保存",
+                "ストーン配置のエクスポート",
                 "output.json",
                 "JSON Files (*.json)"
             )
@@ -214,7 +214,7 @@ class MainWindow(QWidget):
     def import_stones(self) -> None:
         file_path, _ = QFileDialog.getOpenFileName(
             self, 
-            "JSONファイルを選択", 
+            "ストーン配置のインポート", 
             "", 
             "JSON Files (*.json)"
         )
