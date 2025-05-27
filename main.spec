@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Curling Sheet',
+    name='CurlingSheet',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

@@ -18,10 +18,15 @@ python -m venv .venv
 (.venv) pip install -r requirements.txt
 ~~~
 
-### Create exe file
+### Test
+~~~cmd
+python main.py
+~~~
+
+### Create .exe file
 ~~~cmd
 pyinstaller main.spec
 ~~~
 
-Open the "dist" folder and you should see the "Curling Sheet.exe" file.  
+Open the "dist" folder and you should see the "CurlingSheet.exe" file.  
 You can remove "build" folder.
