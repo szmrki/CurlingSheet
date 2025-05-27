@@ -55,6 +55,7 @@ Follow these steps to set display scalling to 100% for the application executabl
 You may want to restore your display scaling to the recommended setting after closing the app.
 
 ## JSON Format
+### Example
 ~~~json
 [
   {
@@ -75,5 +76,4 @@ You may want to restore your display scaling to the recommended setting after cl
 - `y` : The vertical position of the stone(float, range: 32.004 to 40.234)
 - `team` : The team color of the stone (`"red"` of `"yellow"`)
 
-The coordinate system follows the specification used in [DigitalCurling3]
-(https://digitalcurling.github.io/DigitalCurling3/md_coordinate.html).
+The coordinate system follows the specification used in [DigitalCurling3](https://digitalcurling.github.io/DigitalCurling3/md_coordinate.html).
