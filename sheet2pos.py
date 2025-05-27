@@ -163,15 +163,3 @@ def score(df, is_dc3=False) -> tuple[str, int]:
           return no1_team, no1_score
      else:  
           return "Draw", 0
-
-if __name__ == "__main__":
-    img_path = "images/test3.png"
-    stones, output = get_stones_pos(img_path=img_path)
-    dc3_stones = curlit_to_dc3(stones)
-    print(dc3_stones)
-
-    for i in range(len(stones)):
-        cv2.circle(output, (int(stones.at[i, "x"]),int(stones.at[i, "y"])), radius=5, color=(0,0,0), thickness=-1)
-    cv2.imshow("Image", output)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
