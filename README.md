@@ -22,4 +22,6 @@ python -m venv .venv
 ~~~cmd
 pyinstaller main.spec
 ~~~
-Open the "dist" folder and you should see the "Curling Sheet.exe" file.
+
+Open the "dist" folder and you should see the "Curling Sheet.exe" file.  
+You can remove "build" folder.
