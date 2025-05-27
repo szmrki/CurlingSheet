@@ -38,9 +38,10 @@ Open the "dist" folder and you should see the "CurlingSheet.exe" file.
 You can remove "build" folder.
 
 ### Display Settings
-Follow these steps to disable DPI scaling on Windows for the application executable:
+Follow these steps to set display scalling to 100% for the application executable:
 
-1. Right-click the ".exe" file and select **Properties**.
-1. Go to the **Compatibility** tab.
-1. Click **Change high DPI settings**.
-1. Check **Override high DPI scaling behavior** and select **Application** from the dropdown.
+1. Right-click on your desktop and select **Display settings**.
+1. Scroll down to the **Scale & layout** section.
+1. Under **Scale**, select **100%** from the dropdown.
+>Note: Changing the scaling setting affects the entire system. 
+You may want to restore your display scaling to the recommended setting after closing the app.
