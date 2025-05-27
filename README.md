@@ -1,7 +1,8 @@
 # CurlingSheet
-Run the following commands in the Windows Command Prompt (cmd.exe).
+Run the following commands in the Windows.
 
 ## Environment
+- Windows11
 - Python 3.12.x
 
 ## How to Use
@@ -14,7 +15,8 @@ cd CurlingSheet
 ### Create virtual environment
 ~~~cmd
 python -m venv .venv
-.venv\Scripts\activate.bat
+.venv\Scripts\activate.bat #cmd
+.\.venv\Scripts\Activate.ps1 #Powershell
 (.venv) pip install -r requirements.txt
 ~~~
 
