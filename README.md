@@ -15,7 +15,7 @@ Run the following commands in the Windows.
 - Display resolution: **at least 945 pixels in height**
     > Note: The application window height is fixed at 945 pixels.
     > If your screen resolution is high enough but the entire application window is not fully visible, 
-    please check the [display settings](#display-settings) section. 
+    please check the [Display Settings](#display-settings) section. 
 
 ## Installation
 ### Clone this Repository

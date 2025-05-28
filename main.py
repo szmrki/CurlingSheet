@@ -2,8 +2,8 @@ from sheet import Sheet
 from PyQt6.QtWidgets import (QWidget, QPushButton, QRadioButton, QButtonGroup,
                              QVBoxLayout, QHBoxLayout, QFileDialog, QApplication,
                              QGroupBox, QCheckBox, QDialog, QDialogButtonBox,
-                             QComboBox, QLabel)
-from PyQt6.QtGui import QImage, QIcon
+                             QComboBox, QLabel, QToolButton, QMenu)
+from PyQt6.QtGui import QImage, QIcon, QAction
 from PyQt6.QtCore import Qt
 import cv2
 import sheet2pos as sp
@@ -15,6 +15,8 @@ import os
 #exeファイル用
 resource_path = lambda p: os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), p)
 icon_path = resource_path("icon/icon.ico")
+hammer_red = resource_path("icon/hammer_red.ico")
+hammer_yellow = resource_path("icon/hammer_yellow.ico")
 
 # ハウスカラー変更用ダイアログ
 class ColorDialog(QDialog):
@@ -88,6 +90,9 @@ class MainWindow(QWidget):
    
         self.__set_button_group(rule_buttons, self.button_normal)
         self.__set_button_group(place_buttons, self.button_3b)
+
+        self.button_hammer = self.__set_tool_button()
+        rule_buttons.append(self.button_hammer)
         
         #MDの詳細設定について
         self.detail = QGroupBox("MDの詳細設定")
@@ -144,6 +149,43 @@ class MainWindow(QWidget):
         for button in buttons:
             layout.addWidget(button)
         return layout
+    
+    def __set_tool_button(self) -> QToolButton:
+        button = QToolButton()
+
+        button.setIcon(QIcon(hammer_red))
+        button.setText("") # テキストを表示しない
+
+        menu = QMenu()
+        action_red = QAction("赤", self)
+        action_yellow = QAction("黄", self)
+
+        menu.addAction(action_red)
+        menu.addAction(action_yellow)
+
+        #ボタンにメニューを設定
+        button.setMenu(menu)
+        button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+
+        # アクションを選んだときの処理
+        action_red.triggered.connect(lambda: self.__select_option(button, 0))
+        action_yellow.triggered.connect(lambda: self.__select_option(button, 1))
+
+        return button
+    
+    def __select_option(self, button, color: int) -> None:
+        #print(f"選ばれた色：{color}")
+        if color == 0: #赤
+            self.sheet.f = 1
+            self.sheet.l = 0
+            button.setIcon(QIcon(hammer_red))
+        elif color == 1: #黄
+            self.sheet.f = 0
+            self.sheet.l = 1
+            button.setIcon(QIcon(hammer_yellow))
+        else: pass
+        if self.sheet.is_MD:
+            self.sheet.init_MD()
 
     def change_color(self) -> None:
         dialog = ColorDialog(self)

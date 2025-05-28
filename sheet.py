@@ -77,6 +77,7 @@ class Sheet(QWidget):
         self.is_PPL = False
         self.is_PPR = False
         self.md_place = 5
+        self.f = 1; self.l = 0
 
     def paintEvent(self, event) -> None:
         painter = QPainter2(self)
@@ -236,98 +237,98 @@ class Sheet(QWidget):
         center_x = 149; housex = 80; 
         housey = 169; foot8 = 130
         p3b = 360; p3f = 380; p2b = 420; p2f = 440
-        p1b = 480; p1f = 500; f = 0; l = 1
+        p1b = 480; p1f = 500; 
         if self.is_PPL:
             if self.md_place == 5:
                 self.add_stone({
-                    (center_x-housex, housey, l),
-                    (center_x-72, p3b, f)
+                    (center_x-housex, housey, self.l),
+                    (center_x-72, p3b, self.f)
                 })
             elif self.md_place == 4:
                 self.add_stone({
-                    (center_x-housex, housey, l),
-                    (center_x-72, p3f, f)
+                    (center_x-housex, housey, self.l),
+                    (center_x-72, p3f, self.f)
                 })
             elif self.md_place == 3:
                 self.add_stone({
-                    (center_x-housex, housey, l),
-                    (center_x-70, p2b, f)
+                    (center_x-housex, housey, self.l),
+                    (center_x-70, p2b, self.f)
                 })
             elif self.md_place == 2:
                 self.add_stone({
-                    (center_x-housex, housey, l),
-                    (center_x-70, p2f, f)
+                    (center_x-housex, housey, self.l),
+                    (center_x-70, p2f, self.f)
                 })
             elif self.md_place == 1:
                 self.add_stone({
-                    (center_x-housex, housey, l),
-                    (center_x-68, p1b, f)
+                    (center_x-housex, housey, self.l),
+                    (center_x-68, p1b, self.f)
                 })
             elif self.md_place == 0:
                 self.add_stone({
-                    (center_x-housex, housey, l),
-                    (center_x-68, p1f, f)
+                    (center_x-housex, housey, self.l),
+                    (center_x-68, p1f, self.f)
                 })
         elif self.is_PPR:
             if self.md_place == 5:
                 self.add_stone({
-                    (center_x+housex, housey, l),
-                    (center_x+72, p3b, f)
+                    (center_x+housex, housey, self.l),
+                    (center_x+72, p3b, self.f)
                 })
             elif self.md_place == 4:
                 self.add_stone({
-                    (center_x+housex, housey, l),
-                    (center_x+72, p3f, f)
+                    (center_x+housex, housey, self.l),
+                    (center_x+72, p3f, self.f)
                 })
             elif self.md_place == 3:
                 self.add_stone({
-                    (center_x+housex, housey, l),
-                    (center_x+70, p2b, f)
+                    (center_x+housex, housey, self.l),
+                    (center_x+70, p2b, self.f)
                 })
             elif self.md_place == 2:
                 self.add_stone({
-                    (center_x+housex, housey, l),
-                    (center_x+70, p2f, f)
+                    (center_x+housex, housey, self.l),
+                    (center_x+70, p2f, self.f)
                 })
             elif self.md_place == 1:
                 self.add_stone({
-                    (center_x+housex, housey, l),
-                    (center_x+68, p1b, f)
+                    (center_x+housex, housey, self.l),
+                    (center_x+68, p1b, self.f)
                 })
             elif self.md_place == 0:
                 self.add_stone({
-                    (center_x+housex, housey, l),
-                    (center_x+68, p1f, f)
+                    (center_x+housex, housey, self.l),
+                    (center_x+68, p1f, self.f)
                 })
         else:
             if self.md_place == 5:
                 self.add_stone([
-                    (center_x, foot8, l),
-                    (center_x, p3b, f),
+                    (center_x, foot8, self.l),
+                    (center_x, p3b, self.f),
                 ])
             elif self.md_place == 4:
                 self.add_stone({
-                    (center_x, foot8, l),
-                    (center_x, p3f, f)
+                    (center_x, foot8, self.l),
+                    (center_x, p3f, self.f)
                 })
             elif self.md_place == 3:
                 self.add_stone({
-                    (center_x, foot8, l),
-                    (center_x, p2b, f)
+                    (center_x, foot8, self.l),
+                    (center_x, p2b, self.f)
                 })
             elif self.md_place == 2:
                 self.add_stone({
-                    (center_x, foot8, l),
-                    (center_x, p2f, f)
+                    (center_x, foot8, self.l),
+                    (center_x, p2f, self.f)
                 })
             elif self.md_place == 1:
                 self.add_stone({
-                    (center_x, foot8, l),
-                    (center_x, p1b, f)
+                    (center_x, foot8, self.l),
+                    (center_x, p1b, self.f)
                 })
             elif self.md_place == 0:
                 self.add_stone({
-                    (center_x, foot8, l),
-                    (center_x, p1f, f)
+                    (center_x, foot8, self.l),
+                    (center_x, p1f, self.f)
                 })
         self.update()
