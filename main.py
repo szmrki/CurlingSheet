@@ -240,7 +240,7 @@ class MainWindow(QWidget):
         img = np.array(ptr, dtype=np.uint8).reshape((height, width, 4))
         img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR) #透明度を無視
 
-        pos, _ = sp.get_stones_pos(img=img)
+        pos = sp.get_stones_pos(img=img)
         if not pos.empty:
             pos = sp.curlit_to_dc3(pos)
             file_path, _ = QFileDialog.getSaveFileName(

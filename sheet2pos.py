@@ -24,7 +24,6 @@ def get_stones_pos(img_path=None, img=None) -> tuple[pd.DataFrame, np.ndarray]:
      black_pixels = np.all(row20==0, axis=1) 
      if np.all(black_pixels[1:WIDTH]):  #左右1ピクセルが余白の可能性があるため
           img = cv2.flip(img, 0)
-     copy_img = img.copy()
      img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) #RGBに変換
 
      #1. 特定のRGB値を持つエリアを抽出
@@ -89,13 +88,13 @@ def get_stones_pos(img_path=None, img=None) -> tuple[pd.DataFrame, np.ndarray]:
 
      if not stones.empty:
           #4. ストーンのサイズが範囲外のものを除外(未使用のストーンを除く)
-          stones = stones[stones["size"] >= 40].reset_index(drop=True)
+          stones = stones[stones["size"] >= 50].reset_index(drop=True)
 
           #5. エリア外のものを除外(使用済みのストーンを除く)
           stones = stones[(19 < stones["y"]) & (stones["y"] <= 581)].reset_index(drop=True)
           #6. 残った輪郭情報の重心をストーンの座標とする
      
-     return stones, copy_img
+     return stones
 
 #7. デジタルカーリングの座標系に変換する
 def curlit_to_dc3(stones: pd.DataFrame) -> pd.DataFrame:
