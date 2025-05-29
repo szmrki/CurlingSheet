@@ -31,17 +31,6 @@ def get_stones_pos(img_path=None, img=None) -> tuple[pd.DataFrame, np.ndarray]:
      #のget_rock_positionsメソッドを参照
      red_bin = cv2.inRange(img, (240,0,0), (255,0,0)) #赤を取得
      yellow_bin = cv2.inRange(img, (240,192,0), (255,255,30)) #黄色を取得
-     #blue_bin = cv2.inRange(img, (0,0,255),(0,0,255)) #青を取得
-
-     #Greyish-yellow appears to employ two shades in some instances.  Use them
-     #as the bounds of the range.
-     #Original before the "off yellow" expansion:
-     #(32,207,207), (32,223,223)
-     #Increse G by 1 for another shade of grey found (sometimes (rarely) a black X is
-     #used through the yellow stones.  Adding black is problematic for this
-     #algorithm though (triggers on all the lines), so will not do that.
-     #greyish_yellow_bin = cv2.inRange(img, (207,164,0), (239,224,32))
-     #yellow_rocks = cv2.bitwise_or(yellow_bin, cv2.bitwise_or(blue_bin, greyish_yellow_bin))
 
      #2. エリアの輪郭情報を取得
      rock_bin_dict = {"red": red_bin, "yellow":yellow_bin}.items()
@@ -54,28 +43,11 @@ def get_stones_pos(img_path=None, img=None) -> tuple[pd.DataFrame, np.ndarray]:
           #contours: タプル、各要素は輪郭を構成する座標のnp.array
           #hierarchy: 輪郭の階層構造
           contours, hierarchy = cv2.findContours(rock_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-          #for i in range(len(contours)):
-          #    print(f"contours[{i}].shape: ", contours[i].shape)
 
           #3. 重心のRGB値の条件を満たさないものを除外(中空の円)
-          # →存在するストーンに黒ぽちが含まれる可能性があるため、白い領域があれば除外することとした
-          contours = np.array(contours, dtype=object)
-          only_rocks = []
+          #本アプリでは不必要のため削除済
+
           for cnt in contours:
-               mask = np.zeros(img.shape[:2], dtype=np.uint8) #元画像と同じサイズの空マスクを作る
-               cnt = cnt.astype(np.int32)
-               cv2.drawContours(mask, [cnt], -1, 255, thickness=cv2.FILLED) #cntを白で塗る（領域のマスク）
-               masked = cv2.bitwise_and(img, img, mask=mask) #マスクと元画像の論理積をとる
-
-               #領域内に白が含まれているかを判定する
-               roi = masked[mask == 255] 
-               has_white = np.any(np.all(roi==[255,255,255], axis=1))
-
-               if not has_white:
-                    only_rocks.append(cnt)
-          #only_rocks = np.array(contours, dtype=object)[np.all(hierarchy[0,:,2:4] == -1, axis=1)]
-
-          for cnt in only_rocks:
                M = cv2.moments(cnt) #各ストーンのモーメントを求める
                #m00: 面積, m10: x座標に関する1次モーメント, m01: y座標に関する1次モーメント
                cx = M['m10']/max(M['m00'], 1) #重心のx座標を取得
