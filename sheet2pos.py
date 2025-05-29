@@ -13,7 +13,7 @@ DC3_BACKLINE = 40.234
 DC3_CENTER_X = 0
 DC3_RADIUS = 1.829
 
-def get_stones_pos(img_path=None, img=None) -> tuple[pd.DataFrame, np.ndarray]: 
+def get_stones_pos(img_path=None, img=None) -> pd.DataFrame: 
      if isinstance(img_path, str) and img_path.strip():
           img = cv2.imread(img_path)
      if img is None:
