@@ -49,8 +49,8 @@ python main.py
 pyinstaller main.spec
 ~~~
 
-Open the "dist" folder and you should see the "CurlingSheet.exe" file.  
-You can remove "build" folder.
+Open the `dist` folder and you should see the `CurlingSheet.exe` file. This is the latest vesion. 
+You can remove `build` folder.
 
 ### Display Settings
 Follow these steps to set display scalling to 100% for the application executable:
