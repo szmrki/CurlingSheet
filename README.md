@@ -1,5 +1,9 @@
 # CurlingSheet
-Run the following commands in the Windows.
+
+## Quick Start
+The latest version of the application is available on the [Releases page](https://github.com/szmrki/CurlingSheet/releases).
+
+- Download the `CurlingSheet-vX.Y.Z.exe`
 
 ## Features
 - Place stones freely at any position on the sheet
@@ -17,7 +21,10 @@ Run the following commands in the Windows.
     > If your screen resolution is high enough but the entire application window is not fully visible, 
     please check the [Display Settings](#display-settings) section. 
 
-## Installation
+## Installation from Source (on Windows)
+
+If you want to run the app from the source code, follow these steps:
+
 ### Clone this Repository
 ~~~cmd
 git clone https://github.com/szmrki/CurlingSheet.git
