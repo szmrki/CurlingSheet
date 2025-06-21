@@ -66,7 +66,8 @@ class MainWindow(QWidget):
         self.button_change_color = self.__set_push_button("ハウスの色の変更", self.change_color)
         self.button_add_red_stone = self.__set_push_button("赤ストーンを追加", self.add_red_stone_from_button)
         self.button_add_yellow_stone = self.__set_push_button("黄ストーンを追加", self.add_yellow_stone_from_button)
-        self.button_save = self.__set_push_button("画像として保存", self.save_fig)
+        self.button_save = self.__set_push_button("画像のエクスポート", self.save_fig)
+        self.button_import_img = self.__set_push_button("画像のインポート", self.import_fig)
         self.button_export_stones = self.__set_push_button("ストーン配置のエクスポート", self.export_stones)
         self.button_import_stones = self.__set_push_button("ストーン配置のインポート", self.import_stones)
         self.button_clear_stones = self.__set_push_button("クリア", self.sheet.clear_stones)
@@ -107,6 +108,7 @@ class MainWindow(QWidget):
 
         radio_layout = self.__set_qhbox(rule_buttons)
         button_layout = self.__set_qhbox([self.button_add_red_stone, self.button_add_yellow_stone])
+        button_img = self.__set_qhbox([self.button_save, self.button_import_img])
 
         #全体のレイアウト
         layout = QVBoxLayout()
@@ -115,7 +117,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.sheet)
         layout.addWidget(self.button_change_color)
         layout.addLayout(button_layout)
-        layout.addWidget(self.button_save)
+        layout.addLayout(button_img)
         layout.addWidget(self.button_export_stones)
         layout.addWidget(self.button_import_stones)
         layout.addWidget(self.button_clear_stones)
@@ -221,14 +223,29 @@ class MainWindow(QWidget):
     def save_fig(self) -> None:
         file_path, _ = QFileDialog.getSaveFileName(
             self,
-            "画像の保存",
+            "画像のエクスポート",
             "output.png",
-            "PNG画像 (*.png);;JPEG画像 (*.jpg *.jpeg)"
+            "PNG画像 (*.png)"
         )
         if file_path:
             pixmap = self.sheet.grab()
             pixmap.save(file_path)
         else: pass
+
+    def import_fig(self) -> None:
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, 
+            "画像のインポート", 
+            "", 
+            "PNG画像 (*.png)"
+        )
+        if file_path:
+            pos = sp.get_stones_pos(img_path=file_path)
+            pos = pos[["x", "y", "team"]]
+            stones = [tuple(row) for row in pos.values]
+            self.sheet.clear_stones()
+            self.sheet.add_stone(stones)
+        else :pass
 
     def export_stones(self) -> None:
         pixmap = self.sheet.grab()
