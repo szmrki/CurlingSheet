@@ -3,12 +3,12 @@ import cv2
 import numpy as np
 
 WIDTH = 299
-TLINE = 159
+TEELINE = 159.5
 BACKLINE = 40
 CENTER_X = 149
 DIAMETER = 239
 DC3_WIDTH = 4.75
-DC3_TLINE = 38.405
+DC3_TEELINE = 38.405
 DC3_BACKLINE = 40.234
 DC3_CENTER_X = 0
 DC3_RADIUS = 1.829
@@ -72,8 +72,8 @@ def get_stones_pos(img_path=None, img=None) -> pd.DataFrame:
 def curlit_to_dc3(stones: pd.DataFrame) -> pd.DataFrame:
      dc3_stones = stones.copy()
      XA = (DC3_WIDTH / WIDTH); XB = (DC3_WIDTH / 2)   
-     YA = ((DC3_TLINE - DC3_BACKLINE) / (TLINE - BACKLINE))
-     YB = DC3_TLINE - YA * TLINE
+     YA = ((DC3_TEELINE - DC3_BACKLINE) / (TEELINE - BACKLINE))
+     YB = DC3_TEELINE - YA * TEELINE
 
      dc3_stones["x"] = XA * dc3_stones["x"] - XB
      dc3_stones["y"] = YA * dc3_stones["y"] + YB
@@ -84,8 +84,8 @@ def curlit_to_dc3(stones: pd.DataFrame) -> pd.DataFrame:
 def dc3_to_curlit(dc3_stones: pd.DataFrame) -> pd.DataFrame:
      stones = dc3_stones.copy()
      XA = (WIDTH / DC3_WIDTH); XB = (WIDTH / 2)
-     YA = ((TLINE - BACKLINE) / (DC3_TLINE - DC3_BACKLINE))
-     YB = TLINE - YA * DC3_TLINE
+     YA = ((TEELINE - BACKLINE) / (DC3_TEELINE - DC3_BACKLINE))
+     YB = TEELINE - YA * DC3_TEELINE
 
      stones["x"] = XA * stones["x"] + XB
      stones["y"] = YA * stones["y"] + YB
@@ -99,9 +99,9 @@ def df_to_json(df, filename) -> None:
 #appx. 中心との距離を計算する
 def distance_pow(df, is_dc3=False) -> pd.Series:
      if is_dc3:
-          dist = (df["x"] - DC3_CENTER_X)**2 + (df["y"] - DC3_TLINE)**2
+          dist = (df["x"] - DC3_CENTER_X)**2 + (df["y"] - DC3_TEELINE)**2
      else:
-          dist = (df["x"] - CENTER_X)**2 + (df["y"] - TLINE)**2
+          dist = (df["x"] - CENTER_X)**2 + (df["y"] - TEELINE)**2
      return dist
 
 #appx. No.1ストーンを取得する
