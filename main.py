@@ -60,7 +60,6 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("CurlingSheet")
         self.setWindowIcon(QIcon(icon_path))
-        self.setFixedSize(322, 830)
 
         self.sheet = Sheet()
         self.button_change_color = self.__set_push_button("ハウスの色の変更", self.change_color)
@@ -122,6 +121,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.button_import_stones)
         layout.addWidget(self.button_clear_stones)
         
+        layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetFixedSize)
         self.setLayout(layout)
         self.sheet.clear_stones() #初期化
 
@@ -288,7 +288,6 @@ class MainWindow(QWidget):
 
     def normal_rules(self, checked) -> None:
         if checked:
-            self.setFixedHeight(830)
             self.sheet.is_MD = False
             self.sheet.is_PPL = False
             self.sheet.is_PPR = False
@@ -299,7 +298,6 @@ class MainWindow(QWidget):
     def md_rules(self, checked) -> None:
         self.detail.setVisible(checked)
         if checked:
-            self.setFixedHeight(945)
             self.sheet.is_MD = True
             self.sheet.init_MD()
 
