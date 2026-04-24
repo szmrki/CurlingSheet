@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtGui import QPainter, QBrush, QColor
-from stone import BLACK, WHITE
+from .stone import BLACK, WHITE
 
 
 class QPainter2(QPainter):
@@ -18,14 +18,14 @@ class QPainter2(QPainter):
 
     def drawPochi(self, x, y) -> None:
         diameter = 4
-        radius = diameter // 2
+        radius   = diameter // 2
         self.setBrush(QBrush(BLACK))
         self.drawEllipse(x - radius, y - radius, diameter, diameter)
 
     def _house_color(self, idx) -> QColor:
         colors = {
-            0: QColor(255, 0, 0, 80),
-            1: QColor(0, 0, 255, 80),
-            2: QColor(0, 64, 0, 80),
+            0: QColor(255, 0,   0,  80),
+            1: QColor(0,   0,   255, 80),
+            2: QColor(0,   64,  0,  80),
         }
         return colors.get(idx, QColor(0, 0, 0, 0))

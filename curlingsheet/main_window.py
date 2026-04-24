@@ -7,16 +7,15 @@ from PyQt6.QtGui import QImage, QIcon, QAction
 import cv2
 import numpy as np
 import pandas as pd
-import os, sys
 
-from sheet import Sheet
-from dialogs import ColorDialog
-import sheet2pos as sp
+from .sheet import Sheet
+from .dialogs import ColorDialog
+from . import sheet2pos as sp
+from .resources import resource_path
 
-resource_path = lambda p: os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), p)
-icon_path      = resource_path("icon/icon.ico")
-hammer_red     = resource_path("icon/hammer_red.ico")
-hammer_yellow  = resource_path("icon/hammer_yellow.ico")
+icon_path     = resource_path("icon/icon.ico")
+hammer_red    = resource_path("icon/hammer_red.ico")
+hammer_yellow = resource_path("icon/hammer_yellow.ico")
 
 
 class MainWindow(QWidget):
@@ -27,15 +26,14 @@ class MainWindow(QWidget):
 
         self.sheet = Sheet()
 
-        # --- ボタン類 ---
-        self.button_change_color    = self._push("ハウスの色の変更",         self.change_color)
-        self.button_add_red_stone   = self._push("赤ストーンを追加",          self.add_red_stone_from_button)
-        self.button_add_yellow_stone= self._push("黄ストーンを追加",          self.add_yellow_stone_from_button)
-        self.button_save            = self._push("画像のエクスポート",         self.save_fig)
-        self.button_import_img      = self._push("画像のインポート",           self.import_fig)
-        self.button_export_stones   = self._push("ストーン配置のエクスポート", self.export_stones)
-        self.button_import_stones   = self._push("ストーン配置のインポート",   self.import_stones)
-        self.button_clear_stones    = self._push("クリア",                    self.sheet.clear_stones)
+        self.button_change_color     = self._push("ハウスの色の変更",         self.change_color)
+        self.button_add_red_stone    = self._push("赤ストーンを追加",          self.add_red_stone_from_button)
+        self.button_add_yellow_stone = self._push("黄ストーンを追加",          self.add_yellow_stone_from_button)
+        self.button_save             = self._push("画像のエクスポート",         self.save_fig)
+        self.button_import_img       = self._push("画像のインポート",           self.import_fig)
+        self.button_export_stones    = self._push("ストーン配置のエクスポート", self.export_stones)
+        self.button_import_stones    = self._push("ストーン配置のインポート",   self.import_stones)
+        self.button_clear_stones     = self._push("クリア",                    self.sheet.clear_stones)
 
         self.button_normal = self._radio("4人制", self.normal_rules)
         self.button_md     = self._radio("MD",    self.md_rules)
@@ -60,7 +58,6 @@ class MainWindow(QWidget):
         self.button_hammer = self._tool_button()
         rule_buttons.append(self.button_hammer)
 
-        # MDの詳細設定パネル
         self.detail = QGroupBox("MDの詳細設定")
         detail_layout = QVBoxLayout()
         detail_layout.addLayout(self._hbox([self.button_ppl, self.button_ppr]))
@@ -69,7 +66,6 @@ class MainWindow(QWidget):
         self.detail.setLayout(detail_layout)
         self.detail.setVisible(False)
 
-        # 全体レイアウト
         layout = QVBoxLayout()
         layout.addLayout(self._hbox(rule_buttons))
         layout.addWidget(self.detail)
@@ -85,7 +81,6 @@ class MainWindow(QWidget):
 
         self.sheet.clear_stones()
 
-    # --- ウィジェットファクトリ ---
     def _push(self, title, method) -> QPushButton:
         btn = QPushButton(title)
         btn.clicked.connect(method)
@@ -114,7 +109,7 @@ class MainWindow(QWidget):
         return layout
 
     def _tool_button(self) -> QToolButton:
-        btn = QToolButton()
+        btn  = QToolButton()
         btn.setIcon(QIcon(hammer_red))
         btn.setText("")
         menu = QMenu()
@@ -128,7 +123,6 @@ class MainWindow(QWidget):
         action_yellow.triggered.connect(lambda: self._select_hammer(btn, 1))
         return btn
 
-    # --- ハンマー選択 ---
     def _select_hammer(self, button, color: int) -> None:
         if color == 0:
             self.sheet.f, self.sheet.l = 1, 0
@@ -139,7 +133,6 @@ class MainWindow(QWidget):
         if self.sheet.is_MD:
             self.sheet.init_MD()
 
-    # --- ダイアログ ---
     def change_color(self) -> None:
         dialog = ColorDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -147,7 +140,6 @@ class MainWindow(QWidget):
             self.sheet.color4  = dialog.combo4.currentIndex()
             self.sheet.update()
 
-    # --- ストーン追加 ---
     def _add_stone_at(self, x, y, team) -> None:
         self.sheet.add_stone([(x, y, team)])
         self.sheet.selected_stone = self.sheet.stones[-1]
@@ -160,7 +152,6 @@ class MainWindow(QWidget):
     def add_red_stone_from_button(self)    -> None: self._add_stone_at(11,  11, 0)
     def add_yellow_stone_from_button(self) -> None: self._add_stone_at(288, 11, 1)
 
-    # --- ファイルI/O ---
     def save_fig(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "画像のエクスポート",
                                               "output.png", "PNG画像 (*.png)")
@@ -176,13 +167,12 @@ class MainWindow(QWidget):
             self.sheet.add_stone([tuple(row) for row in pos.values])
 
     def export_stones(self) -> None:
-        pixmap  = self.sheet.grab()
-        qimage  = pixmap.toImage().convertToFormat(QImage.Format.Format_RGBA8888)
-        ptr     = qimage.bits()
+        pixmap = self.sheet.grab()
+        qimage = pixmap.toImage().convertToFormat(QImage.Format.Format_RGBA8888)
+        ptr    = qimage.bits()
         ptr.setsize(qimage.sizeInBytes())
         img = np.array(ptr, dtype=np.uint8).reshape((qimage.height(), qimage.width(), 4))
         img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
-
         pos = sp.get_stones_pos(img=img)
         if not pos.empty:
             pos  = sp.curlit_to_dc3(pos)
@@ -201,7 +191,6 @@ class MainWindow(QWidget):
             self.sheet.clear_stones()
             self.sheet.add_stone([tuple(row) for row in df.values])
 
-    # --- ルール切替 ---
     def normal_rules(self, checked) -> None:
         if checked:
             self.sheet.is_MD = self.sheet.is_PPL = self.sheet.is_PPR = False

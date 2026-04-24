@@ -1,41 +1,39 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtGui import QPen
-from stone import Stone, WHITE, BLACK
-from painter import QPainter2
-import md_positions as mdp
+from .stone import Stone, WHITE, BLACK, RED, YELLOW
+from .painter import QPainter2
+from . import md_positions as mdp
 
 
 class Sheet(QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.setFixedSize(300, 600)
-        self.color12 = 2
-        self.color4 = 0
-        self.stones = []
-        self.is_MD = False
-        self.is_PPL = False
-        self.is_PPR = False
-        self.md_place = 5
-        self.f = 1
-        self.l = 0
+        self.color12        = 2
+        self.color4         = 0
+        self.stones         = []
+        self.is_MD          = False
+        self.is_PPL         = False
+        self.is_PPR         = False
+        self.md_place       = 5
+        self.f              = 1
+        self.l              = 0
         self.selected_stone = None
 
     def paintEvent(self, event) -> None:
         painter = QPainter2(self)
         painter.fillRect(self.rect(), WHITE)
-
-        line_pen = QPen(BLACK, 1)
-        painter.setPen(line_pen)
+        painter.setPen(QPen(BLACK, 1))
         painter.drawRect(0, 0, 299, 599)
 
         cx = mdp.CENTER_X
         painter.drawHouse(cx, mdp.HOUSEY, self.color12, self.color4)
 
-        painter.drawLine(cx, 0, cx, 600)       # センターライン
-        painter.drawLine(0, 40, 299, 40)        # バックライン
-        painter.drawLine(0, mdp.HOUSEY, 299, mdp.HOUSEY)  # ティーライン
-        painter.drawLine(0, 580, 299, 580)      # ホグライン
+        painter.drawLine(cx, 0,   cx,  600)                    # センターライン
+        painter.drawLine(0,  40,  299, 40)                     # バックライン
+        painter.drawLine(0,  mdp.HOUSEY, 299, mdp.HOUSEY)      # ティーライン
+        painter.drawLine(0,  580, 299, 580)                    # ホグライン
 
         for x, y in [(cx, 370), (cx-72, 370), (cx+72, 370),
                      (cx, 430), (cx-70, 430), (cx+70, 430),
@@ -59,17 +57,14 @@ class Sheet(QWidget):
     def mouseMoveEvent(self, event) -> None:
         if not self.selected_stone:
             return
-        px = event.position().x()
-        py = event.position().y()
+        px    = event.position().x()
+        py    = event.position().y()
         new_x = int(px) + self.offset_x
         new_y = int(py) + self.offset_y
-
-        r = self.selected_stone.radius
-        w = self.width()
-        h = self.height()
+        r     = self.selected_stone.radius
+        w, h  = self.width(), self.height()
         new_x = max(r, min(new_x, w - r))
         new_y = max(r, min(new_y, h - r))
-
         self.check_stone_overlap(new_x, new_y, r, w, h)
         self.update()
 
@@ -88,8 +83,8 @@ class Sheet(QWidget):
             for stone in reversed(self.stones):
                 if stone == self.selected_stone:
                     continue
-                dx = new_x - stone.x
-                dy = new_y - stone.y
+                dx   = new_x - stone.x
+                dy   = new_y - stone.y
                 dist = (dx**2 + dy**2) ** 0.5
                 min_dist = r + stone.radius
                 if dist < min_dist:
@@ -101,17 +96,14 @@ class Sheet(QWidget):
                         else:
                             lcount += 1
                             dx = -min_dist * lcount
-                        dy = 0
+                        dy   = 0
                         dist = min_dist
-                    push_x = dx / dist * min_dist
-                    push_y = dy / dist * min_dist
-                    new_x = int(stone.x + push_x)
-                    new_y = int(stone.y + push_y)
+                    new_x = int(stone.x + dx / dist * min_dist)
+                    new_y = int(stone.y + dy / dist * min_dist)
                     new_x = max(r, min(new_x, w - r))
                     new_y = max(r, min(new_y, h - r))
             if not overlap_found:
                 break
-
         self.selected_stone.x = new_x
         self.selected_stone.y = new_y
 
@@ -121,8 +113,8 @@ class Sheet(QWidget):
             if all(over):
                 break
             elif any(over):
-                false_indice = [i for i, val in enumerate(over) if not val][0]
-                if stone[2] == false_indice:
+                idx = [i for i, v in enumerate(over) if not v][0]
+                if stone[2] == idx:
                     self.stones.append(Stone(stone))
             else:
                 self.stones.append(Stone(stone))
@@ -133,8 +125,7 @@ class Sheet(QWidget):
         self.update()
 
     def count_stones(self) -> tuple[int, int]:
-        from stone import RED, YELLOW
-        team0 = sum(1 for s in self.stones if s.team in (0, "red", RED))
+        team0 = sum(1 for s in self.stones if s.team in (0, "red",    RED))
         team1 = sum(1 for s in self.stones if s.team in (1, "yellow", YELLOW))
         return team0, team1
 
@@ -143,7 +134,6 @@ class Sheet(QWidget):
 
     def init_MD(self) -> None:
         self.clear_stones()
-        stones = mdp.get_md_stones(self.md_place, self.is_PPL, self.is_PPR,
-                                   self.f, self.l)
-        self.add_stone(stones)
+        self.add_stone(mdp.get_md_stones(self.md_place, self.is_PPL, self.is_PPR,
+                                         self.f, self.l))
         self.update()

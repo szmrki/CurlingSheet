@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 CENTER_X = 149
-HOUSEX = 80
-HOUSEY = 169
-FOOT8 = 130
+HOUSEX   = 80
+HOUSEY   = 169
+FOOT8    = 130
 
 # md_place -> (f_stone_y, pp_x_offset)
 # md_place: 5=3b, 4=3f, 3=2b, 2=2f, 1=1b, 0=1f

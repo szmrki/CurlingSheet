@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-from PyQt6.QtWidgets import QApplication
-from main_window import MainWindow
-import sys
+from curlingsheet.main import main
 
 if __name__ == "__main__":
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
+    main()

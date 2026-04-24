@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtGui import QPen, QColor
 
-WHITE = QColor(255, 255, 255)
-BLACK = QColor(0, 0, 0)
-RED = QColor(255, 0, 0)
+WHITE  = QColor(255, 255, 255)
+BLACK  = QColor(0, 0, 0)
+RED    = QColor(255, 0, 0)
 YELLOW = QColor(255, 255, 0)
 
 
 class Stone:
     def __init__(self, config) -> None:
-        self.x = int(config[0])
-        self.y = int(config[1])
-        self.team = config[2]
+        self.x      = int(config[0])
+        self.y      = int(config[1])
+        self.team   = config[2]
         self.radius = 9
 
     def draw(self, painter) -> None:

@@ -3,9 +3,8 @@ from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QVBoxLayout,
                               QHBoxLayout, QComboBox, QLabel)
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
-import os, sys
+from .resources import resource_path
 
-resource_path = lambda p: os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), p)
 icon_path = resource_path("icon/icon.ico")
 
 

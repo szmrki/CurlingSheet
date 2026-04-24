@@ -1,13 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "curlingsheet"
 version = "0.1.0"
-description = "Add your description here"
+description = "Curling sheet stone placement viewer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.4.4",
     "opencv-python>=4.13.0.92",
     "pandas>=3.0.2",
-    "pyinstaller>=6.20.0",
     "pyqt6>=6.11.0",
 ]
+
+[project.scripts]
+curlingsheet = "curlingsheet.main:main"
+
+[project.optional-dependencies]
+build = ["pyinstaller>=6.20.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["curlingsheet"]

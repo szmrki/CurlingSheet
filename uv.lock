@@ -22,13 +22,17 @@ wheels = [
 [[package]]
 name = "curlingsheet"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "numpy" },
     { name = "opencv-python" },
     { name = "pandas" },
-    { name = "pyinstaller" },
     { name = "pyqt6" },
+]
+
+[package.optional-dependencies]
+build = [
+    { name = "pyinstaller" },
 ]
 
 [package.metadata]
@@ -36,9 +40,10 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.4.4" },
     { name = "opencv-python", specifier = ">=4.13.0.92" },
     { name = "pandas", specifier = ">=3.0.2" },
-    { name = "pyinstaller", specifier = ">=6.20.0" },
+    { name = "pyinstaller", marker = "extra == 'build'", specifier = ">=6.20.0" },
     { name = "pyqt6", specifier = ">=6.11.0" },
 ]
+provides-extras = ["build"]
 
 [[package]]
 name = "macholib"
