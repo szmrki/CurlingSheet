@@ -15,11 +15,30 @@ The latest version of the application is available on the [Releases page](https:
 
 ## System Requirements
 - Windows11
-- Python 3.12.x
+- Python 3.12+
 - Display resolution: **at least 945 pixels in height**
     > Note: The application window height is fixed at 945 pixels.
     > If your screen resolution is high enough but the entire application window is not fully visible, 
     please check the [Display Settings](#display-settings) section. 
+
+## Installation via pip
+
+~~~cmd
+pip install git+https://github.com/szmrki/CurlingSheet.git
+~~~
+
+After installation, launch the app with:
+
+~~~cmd
+curlingsheet
+~~~
+
+You can also use modules in your own project:
+
+~~~python
+from curlingsheet.sheet import Sheet
+from curlingsheet import sheet2pos as sp
+~~~
 
 ## Installation from Source (on Windows)
 
@@ -36,7 +55,7 @@ cd CurlingSheet
 python -m venv .venv
 .venv\Scripts\activate.bat      #cmd
 .\.venv\Scripts\Activate.ps1    #Powershell
-(.venv) pip install -r requirements.txt
+(.venv) pip install -e .
 ~~~
 
 ### Test
