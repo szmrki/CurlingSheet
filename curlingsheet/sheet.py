@@ -20,6 +20,7 @@ class Sheet(QWidget):
         self.f              = 1
         self.l              = 0
         self.selected_stone = None
+        self._show_pochi   = True
 
     def paintEvent(self, event) -> None:
         painter = QPainter2(self)
@@ -35,13 +36,23 @@ class Sheet(QWidget):
         painter.drawLine(0,  mdp.HOUSEY, 299, mdp.HOUSEY)      # ティーライン
         painter.drawLine(0,  580, 299, 580)                    # ホグライン
 
-        for x, y in [(cx, 370), (cx-72, 370), (cx+72, 370),
-                     (cx, 430), (cx-70, 430), (cx+70, 430),
-                     (cx, 490), (cx-68, 490), (cx+68, 490)]:
-            painter.drawPochi(x, y)
+        if self._show_pochi:
+            for x, y in [(cx, 370), (cx-72, 370), (cx+72, 370),
+                         (cx, 430), (cx-70, 430), (cx+70, 430),
+                         (cx, 490), (cx-68, 490), (cx+68, 490)]:
+                painter.drawPochi(x, y)
 
         for stone in self.stones:
             stone.draw(painter)
+
+    @property
+    def show_pochi(self) -> bool:
+        return self._show_pochi
+
+    @show_pochi.setter
+    def show_pochi(self, value: bool) -> None:
+        self._show_pochi = value
+        self.update()
 
     def mousePressEvent(self, event) -> None:
         px = event.position().x()

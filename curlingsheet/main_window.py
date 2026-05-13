@@ -44,8 +44,10 @@ class MainWindow(QWidget):
         self.button_1b = self._radio("1b", self.set_1b)
         self.button_1f = self._radio("1f", self.set_1f)
 
-        self.button_ppl = self._check("PP-Left",  self.set_ppl)
-        self.button_ppr = self._check("PP-Right", self.set_ppr)
+        self.button_ppl   = self._check("PP-Left",  self.set_ppl)
+        self.button_ppr   = self._check("PP-Right", self.set_ppr)
+        self.button_pochi = self._check("MDポイントを表示", self.toggle_pochi)
+        self.button_pochi.setChecked(True)
 
         rule_buttons  = [self.button_normal, self.button_md]
         place_buttons = [self.button_3b, self.button_3f,
@@ -76,6 +78,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.button_export_stones)
         layout.addWidget(self.button_import_stones)
         layout.addWidget(self.button_clear_stones)
+        layout.addWidget(self.button_pochi)
         layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetFixedSize)
         self.setLayout(layout)
 
@@ -233,3 +236,6 @@ class MainWindow(QWidget):
 
     def set_1f(self, checked) -> None:
         if checked: self.sheet.md_place = 0; self.sheet.init_MD()
+
+    def toggle_pochi(self, checked) -> None:
+        self.sheet.show_pochi = checked
