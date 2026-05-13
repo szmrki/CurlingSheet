@@ -2,12 +2,12 @@
 
 
 a = Analysis(
-    ['main.py', 'sheet.py', 'sheet2pos.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('icon/icon.ico', 'icon'),
-           ('icon/hammer_red.ico', 'icon'),
-           ('icon/hammer_yellow.ico', 'icon')],
+    datas=[('curlingsheet/icon/icon.ico',        'icon'),
+           ('curlingsheet/icon/hammer_red.ico',  'icon'),
+           ('curlingsheet/icon/hammer_yellow.ico','icon')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -25,10 +25,10 @@ exe = EXE(
     a.datas,
     [],
     name='CurlingSheet',
-    debug=False,
+    debug=True,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,
@@ -37,5 +37,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon/icon.ico'
+    icon='curlingsheet/icon/icon.ico'
 )
