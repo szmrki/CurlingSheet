@@ -20,6 +20,7 @@ curlingsheet = "curlingsheet.main:main"
 
 [project.optional-dependencies]
 build = ["pyinstaller>=6.20.0"]
+mpl = ["matplotlib>=3.8"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["curlingsheet"]

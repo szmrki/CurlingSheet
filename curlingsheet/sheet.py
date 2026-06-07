@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtGui import QPen
-from .stone import Stone, WHITE, BLACK, RED, YELLOW
-from .painter import QPainter2
+from PyQt6.QtGui import QPainter
+from .stone import Stone, RED, YELLOW
 from . import md_positions as mdp
+from .spec import build_sheet_spec, SheetOptions
+from .renderers.qt import render_qt
 
 
 class Sheet(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, show_pochi: bool = True, show_frame: bool = True) -> None:
         super().__init__()
         self.setFixedSize(300, 600)
         self.color12        = 2
@@ -20,30 +21,17 @@ class Sheet(QWidget):
         self.f              = 1
         self.l              = 0
         self.selected_stone = None
-        self._show_pochi   = True
+        self._show_pochi    = show_pochi
+        self._show_frame    = show_frame
+
+    def options(self) -> SheetOptions:
+        return SheetOptions(show_pochi=self._show_pochi, show_frame=self._show_frame,
+                            color12=self.color12, color4=self.color4)
 
     def paintEvent(self, event) -> None:
-        painter = QPainter2(self)
-        painter.fillRect(self.rect(), WHITE)
-        painter.setPen(QPen(BLACK, 1))
-        painter.drawRect(0, 0, 299, 599)
-
-        cx = mdp.CENTER_X
-        painter.drawHouse(cx, mdp.HOUSEY, self.color12, self.color4)
-
-        painter.drawLine(cx, 0,   cx,  600)                    # センターライン
-        painter.drawLine(0,  40,  299, 40)                     # バックライン
-        painter.drawLine(0,  mdp.HOUSEY, 299, mdp.HOUSEY)      # ティーライン
-        painter.drawLine(0,  580, 299, 580)                    # ホグライン
-
-        if self._show_pochi:
-            for x, y in [(cx, 370), (cx-72, 370), (cx+72, 370),
-                         (cx, 430), (cx-70, 430), (cx+70, 430),
-                         (cx, 490), (cx-68, 490), (cx+68, 490)]:
-                painter.drawPochi(x, y)
-
-        for stone in self.stones:
-            stone.draw(painter)
+        painter = QPainter(self)
+        spec = build_sheet_spec(self.options(), self.stones)
+        render_qt(spec, painter)
 
     @property
     def show_pochi(self) -> bool:
@@ -52,6 +40,15 @@ class Sheet(QWidget):
     @show_pochi.setter
     def show_pochi(self, value: bool) -> None:
         self._show_pochi = value
+        self.update()
+
+    @property
+    def show_frame(self) -> bool:
+        return self._show_frame
+
+    @show_frame.setter
+    def show_frame(self, value: bool) -> None:
+        self._show_frame = value
         self.update()
 
     def mousePressEvent(self, event) -> None:
