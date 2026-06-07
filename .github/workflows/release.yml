@@ -1,0 +1,44 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # Release 作成・アセット添付に必要
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --extra build
+
+      - name: Verify version matches tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}".TrimStart('v')
+          $ver = (uv run python -c "import curlingsheet; print(curlingsheet.__version__)").Trim()
+          Write-Host "tag=$tag  package=$ver"
+          if ($tag -ne $ver) {
+            throw "Tag v$tag does not match package version $ver (curlingsheet/__init__.py を更新してください)"
+          }
+
+      - name: Build exe
+        run: uv run pyinstaller main.spec
+
+      - name: Rename exe
+        shell: pwsh
+        run: Rename-Item dist/CurlingSheet.exe "CurlingSheet-${{ github.ref_name }}.exe"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/CurlingSheet-*.exe
+          generate_release_notes: true
