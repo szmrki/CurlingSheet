@@ -48,8 +48,10 @@ class MainWindow(QWidget):
         self.button_ppr   = self._check("PP-Right", self.set_ppr)
         self.button_pochi = self._check("MDポイントを表示", self.toggle_pochi)
         self.button_pochi.setChecked(True)
+        self.button_frame = self._check("外枠を表示", self.toggle_frame)
+        self.button_frame.setChecked(True)
 
-        rule_buttons  = [self.button_normal, self.button_md]
+        rule_buttons: list[QWidget] = [self.button_normal, self.button_md]
         place_buttons = [self.button_3b, self.button_3f,
                          self.button_2b, self.button_2f,
                          self.button_1b, self.button_1f]
@@ -78,7 +80,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.button_export_stones)
         layout.addWidget(self.button_import_stones)
         layout.addWidget(self.button_clear_stones)
-        layout.addWidget(self.button_pochi)
+        layout.addLayout(self._hbox([self.button_pochi, self.button_frame]))
         layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetFixedSize)
         self.setLayout(layout)
 
@@ -173,6 +175,7 @@ class MainWindow(QWidget):
         pixmap = self.sheet.grab()
         qimage = pixmap.toImage().convertToFormat(QImage.Format.Format_RGBA8888)
         ptr    = qimage.bits()
+        assert ptr is not None
         ptr.setsize(qimage.sizeInBytes())
         img = np.array(ptr, dtype=np.uint8).reshape((qimage.height(), qimage.width(), 4))
         img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
@@ -239,3 +242,6 @@ class MainWindow(QWidget):
 
     def toggle_pochi(self, checked) -> None:
         self.sheet.show_pochi = checked
+
+    def toggle_frame(self, checked) -> None:
+        self.sheet.show_frame = checked

@@ -48,5 +48,6 @@ def image_bytes(image):
 
     rgba = image.convertToFormat(QImage.Format.Format_RGBA8888)
     buf = rgba.bits()
+    assert buf is not None
     buf.setsize(rgba.sizeInBytes())
     return bytes(buf)
