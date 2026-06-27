@@ -48,6 +48,8 @@ class MainWindow(QWidget):
         self.button_ppr   = self._check("PP-Right", self.set_ppr)
         self.button_pochi = self._check("MDポイントを表示", self.toggle_pochi)
         self.button_pochi.setChecked(True)
+        self.button_frame = self._check("外枠を表示", self.toggle_frame)
+        self.button_frame.setChecked(True)
 
         rule_buttons  = [self.button_normal, self.button_md]
         place_buttons = [self.button_3b, self.button_3f,
@@ -78,7 +80,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.button_export_stones)
         layout.addWidget(self.button_import_stones)
         layout.addWidget(self.button_clear_stones)
-        layout.addWidget(self.button_pochi)
+        layout.addLayout(self._hbox([self.button_pochi, self.button_frame]))
         layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetFixedSize)
         self.setLayout(layout)
 
@@ -239,3 +241,6 @@ class MainWindow(QWidget):
 
     def toggle_pochi(self, checked) -> None:
         self.sheet.show_pochi = checked
+
+    def toggle_frame(self, checked) -> None:
+        self.sheet.show_frame = checked
