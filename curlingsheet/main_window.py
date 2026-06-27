@@ -51,7 +51,7 @@ class MainWindow(QWidget):
         self.button_frame = self._check("外枠を表示", self.toggle_frame)
         self.button_frame.setChecked(True)
 
-        rule_buttons  = [self.button_normal, self.button_md]
+        rule_buttons: list[QWidget] = [self.button_normal, self.button_md]
         place_buttons = [self.button_3b, self.button_3f,
                          self.button_2b, self.button_2f,
                          self.button_1b, self.button_1f]
@@ -175,6 +175,7 @@ class MainWindow(QWidget):
         pixmap = self.sheet.grab()
         qimage = pixmap.toImage().convertToFormat(QImage.Format.Format_RGBA8888)
         ptr    = qimage.bits()
+        assert ptr is not None
         ptr.setsize(qimage.sizeInBytes())
         img = np.array(ptr, dtype=np.uint8).reshape((qimage.height(), qimage.width(), 4))
         img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
