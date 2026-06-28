@@ -3,7 +3,8 @@ from PyQt6.QtWidgets import (QWidget, QPushButton, QRadioButton, QButtonGroup,
                               QVBoxLayout, QHBoxLayout, QFileDialog,
                               QGroupBox, QCheckBox, QDialog, QToolButton, QMenu,
                               QLabel, QApplication)
-from PyQt6.QtGui import QImage, QIcon, QAction
+from PyQt6.QtGui import QImage, QIcon, QAction, QCloseEvent
+from PyQt6.QtCore import Qt
 import cv2
 import numpy as np
 import pandas as pd
@@ -38,6 +39,10 @@ class MainWindow(QWidget):
 
         self.button_normal = self._radio("4人制", self.normal_rules)
         self.button_md     = self._radio("MD",    self.md_rules)
+        # 既にMD選択中にもう一度MDを押したときは toggled が発火しない
+        # (状態が変わらないため)。clicked を併用し、閉じた詳細ウィンドウを
+        # 再度開けるようにする。
+        self.button_md.clicked.connect(self.show_detail)
         self.button_3b = self._radio("3b", self.set_3b)
         self.button_3f = self._radio("3f", self.set_3f)
         self.button_2b = self._radio("2b", self.set_2b)
@@ -63,7 +68,13 @@ class MainWindow(QWidget):
         self.button_hammer = self._tool_button()
         rule_buttons.append(self.button_hammer)
 
-        self.detail = QGroupBox("MDの詳細設定")
+        # MDの詳細設定は独立した非モーダルウィンドウにする。
+        # Qt.WindowType.Window を親付きで指定すると、メインの上に重ならず
+        # 別ウィンドウとして表示でき、かつメイン側も操作し続けられる
+        # (非モーダル)。設定を変えながらシートの結果を確認できる。
+        self.detail = QWidget(self, Qt.WindowType.Window)
+        self.detail.setWindowTitle("MDの詳細設定")
+        self.detail.setWindowIcon(QIcon(icon_path))
         detail_layout = QVBoxLayout()
         detail_layout.addLayout(self._hbox([self.button_ppl, self.button_ppr]))
         detail_layout.addWidget(QLabel("初期配置 (b: 後  f: 前)"))
@@ -71,10 +82,10 @@ class MainWindow(QWidget):
         self.detail.setLayout(detail_layout)
         self.detail.setVisible(False)
 
-        # 左カラム: ルール選択(上部) + シート本体
+        # 左カラム: シート本体のみ(表示専用)。
+        # ルール選択や詳細設定はすべて右カラム/別ウィンドウへ移し、
+        # 「左=表示 / 右=操作」と役割を分離した。
         left = QVBoxLayout()
-        left.addLayout(self._hbox(rule_buttons))
-        left.addWidget(self.detail)
         left.addWidget(self.sheet)
         left.addStretch()  # シートを上寄せにし、余白を下に集める
 
@@ -82,6 +93,9 @@ class MainWindow(QWidget):
         # 以前はシートの下に縦積みしていたため全体が縦長(約945px)になっていたが、
         # シート横の余白に寄せることでウィンドウ高さをシート(600px)程度に抑える。
         # 各グループの間に addStretch を入れ、シート高さいっぱいに均等に散らす。
+        group_rule = self._groupbox("ルール", [
+            self._hbox(rule_buttons),
+        ])
         group_stone = self._groupbox("ストーン操作", [
             self._hbox([self.button_add_red_stone, self.button_add_yellow_stone]),
             self.button_clear_stones,
@@ -101,6 +115,8 @@ class MainWindow(QWidget):
         ])
 
         right = QVBoxLayout()
+        right.addWidget(group_rule)
+        right.addStretch()
         right.addWidget(group_stone)
         right.addStretch()
         right.addWidget(group_image)
@@ -283,10 +299,33 @@ class MainWindow(QWidget):
             self.sheet.clear_stones()
 
     def md_rules(self, checked) -> None:
-        self.detail.setVisible(checked)
         if checked:
             self.sheet.is_MD = True
             self.sheet.init_MD()
+            self.show_detail()
+        else:
+            # MD以外を選んだら詳細設定ウィンドウは閉じる
+            self.detail.hide()
+
+    def show_detail(self) -> None:
+        """MD詳細設定ウィンドウをメインウィンドウに重ねて表示する。
+
+        MD選択時、および既にMD選択中にMDボタンを再クリックしたときに
+        呼ばれる。メインウィンドウの左上から少し内側にずらして配置し、
+        手前に重ねて表示する。MD以外を選択中は何もしない。
+
+        Returns:
+            None
+        """
+        # MD以外を選んでいるときは詳細設定を開かない
+        if not self.button_md.isChecked():
+            return
+        # メインウィンドウの左上から少し内側にずらして重ねて表示する
+        geom = self.geometry()
+        self.detail.move(geom.x() + 40, geom.y() + 40)
+        self.detail.show()
+        self.detail.raise_()           # 他ウィンドウより手前に出す
+        self.detail.activateWindow()   # フォーカスを与える
 
     def set_ppl(self, checked) -> None:
         self.sheet.is_PPL = checked
@@ -323,3 +362,18 @@ class MainWindow(QWidget):
 
     def toggle_frame(self, checked) -> None:
         self.sheet.show_frame = checked
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        """メインウィンドウを閉じる際の処理。
+
+        MD詳細設定は別ウィンドウのため、メインを閉じても残ってしまう
+        ことがある。アプリ全体が確実に終了するよう明示的に閉じる。
+
+        Args:
+            event: ウィンドウのクローズイベント。
+
+        Returns:
+            None
+        """
+        self.detail.close()
+        super().closeEvent(event)
