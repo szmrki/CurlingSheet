@@ -5,7 +5,7 @@
 (外枠・各ライン・ハウスの同心円・MD ポイント等)をここへ集約した。
 中心線やハウス中心の座標は ``md_positions`` を単一の出典とする。
 """
-from .md_positions import CENTER_X, HOUSEY
+from .md_positions import CENTER_X
 
 # シート全体のサイズ(QWidget の固定サイズと一致)
 SHEET_W = 300
@@ -16,7 +16,7 @@ FRAME = (0, 0, 299, 599)
 
 # 各ラインの y 座標
 BACK_LINE_Y = 40        # バックライン
-TEE_LINE_Y = HOUSEY     # ティーライン(= ハウス中心 y)
+TEE_LINE_Y = 159     # ティーライン(= ハウス中心 y)
 HOG_LINE_Y = 580        # ホグライン
 LINE_X_END = 299        # 横ラインの右端
 

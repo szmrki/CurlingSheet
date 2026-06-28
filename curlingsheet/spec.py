@@ -52,7 +52,7 @@ class SheetOptions:
 
 
 def _house_items(color12, color4) -> list:
-    cx, cy = g.CENTER_X, g.HOUSEY
+    cx, cy = g.CENTER_X, g.TEE_LINE_Y
     palette = {"c12": _house_color(color12), "white": WHITE, "c4": _house_color(color4)}
     return [
         Circle(cx, cy, diameter / 2, fill=palette[key], stroke=BLACK, stroke_w=1)
