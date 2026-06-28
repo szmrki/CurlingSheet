@@ -71,18 +71,49 @@ class MainWindow(QWidget):
         self.detail.setLayout(detail_layout)
         self.detail.setVisible(False)
 
-        layout = QVBoxLayout()
-        layout.addLayout(self._hbox(rule_buttons))
-        layout.addWidget(self.detail)
-        layout.addWidget(self.sheet)
-        layout.addWidget(self.button_change_color)
-        layout.addLayout(self._hbox([self.button_add_red_stone, self.button_add_yellow_stone]))
-        layout.addLayout(self._hbox([self.button_save, self.button_copy, self.button_import_img]))
-        layout.addWidget(self.button_export_stones)
-        layout.addWidget(self.button_import_stones)
-        layout.addWidget(self.button_clear_stones)
-        layout.addLayout(self._hbox([self.button_pochi, self.button_frame]))
-        layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetFixedSize)
+        # 左カラム: ルール選択(上部) + シート本体
+        left = QVBoxLayout()
+        left.addLayout(self._hbox(rule_buttons))
+        left.addWidget(self.detail)
+        left.addWidget(self.sheet)
+        left.addStretch()  # シートを上寄せにし、余白を下に集める
+
+        # 右カラム: 各種操作ボタンを機能ごとにグループ化して縦に並べる。
+        # 以前はシートの下に縦積みしていたため全体が縦長(約945px)になっていたが、
+        # シート横の余白に寄せることでウィンドウ高さをシート(600px)程度に抑える。
+        # 各グループの間に addStretch を入れ、シート高さいっぱいに均等に散らす。
+        group_stone = self._groupbox("ストーン操作", [
+            self._hbox([self.button_add_red_stone, self.button_add_yellow_stone]),
+            self.button_clear_stones,
+        ])
+        group_image = self._groupbox("画像", [
+            self.button_save,
+            self.button_copy,
+            self.button_import_img,
+        ])
+        group_data = self._groupbox("ストーン配置データ", [
+            self.button_export_stones,
+            self.button_import_stones,
+        ])
+        group_view = self._groupbox("表示設定", [
+            self.button_change_color,
+            self._hbox([self.button_pochi, self.button_frame]),
+        ])
+
+        right = QVBoxLayout()
+        right.addWidget(group_stone)
+        right.addStretch()
+        right.addWidget(group_image)
+        right.addStretch()
+        right.addWidget(group_data)
+        right.addStretch()
+        right.addWidget(group_view)
+
+        # 左右カラムを横並びに配置する
+        layout = QHBoxLayout()
+        layout.addLayout(left)
+        layout.addLayout(right)
+        layout.setSizeConstraint(QHBoxLayout.SizeConstraint.SetFixedSize)
         self.setLayout(layout)
 
         self.sheet.clear_stones()
@@ -90,6 +121,9 @@ class MainWindow(QWidget):
     def _push(self, title, method) -> QPushButton:
         btn = QPushButton(title)
         btn.clicked.connect(method)
+        # 右カラムのボタンが縦に細くならないよう最低高さを確保し、
+        # グループ間の余白とあわせて見た目のバランスを整える。
+        btn.setMinimumHeight(40)
         return btn
 
     def _radio(self, title, method) -> QRadioButton:
@@ -113,6 +147,31 @@ class MainWindow(QWidget):
         for w in widgets:
             layout.addWidget(w)
         return layout
+
+    def _groupbox(self, title: str, rows: list) -> QGroupBox:
+        """見出し付きの枠(QGroupBox)に行を縦に並べて返す。
+
+        右カラムのボタン群を機能ごとにまとめて視認性を上げるために使う。
+
+        Args:
+            title: グループ枠の見出しテキスト。
+            rows: 枠内に上から並べる要素のリスト。各要素は
+                ウィジェット(QWidget)単体、またはレイアウト(QLayout)を受け付ける。
+                レイアウトを渡すと ``_hbox`` で作った横並びをそのまま1行にできる。
+
+        Returns:
+            行を縦に積んだ QGroupBox。
+        """
+        box    = QGroupBox(title)
+        vbox   = QVBoxLayout()
+        for row in rows:
+            # ウィジェットとレイアウトで追加メソッドが異なるため振り分ける
+            if isinstance(row, QWidget):
+                vbox.addWidget(row)
+            else:
+                vbox.addLayout(row)
+        box.setLayout(vbox)
+        return box
 
     def _tool_button(self) -> QToolButton:
         btn  = QToolButton()
