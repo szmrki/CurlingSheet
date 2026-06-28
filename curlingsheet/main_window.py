@@ -2,7 +2,7 @@
 from PyQt6.QtWidgets import (QWidget, QPushButton, QRadioButton, QButtonGroup,
                               QVBoxLayout, QHBoxLayout, QFileDialog,
                               QGroupBox, QCheckBox, QDialog, QToolButton, QMenu,
-                              QLabel)
+                              QLabel, QApplication)
 from PyQt6.QtGui import QImage, QIcon, QAction
 import cv2
 import numpy as np
@@ -30,6 +30,7 @@ class MainWindow(QWidget):
         self.button_add_red_stone    = self._push("赤ストーンを追加",          self.add_red_stone_from_button)
         self.button_add_yellow_stone = self._push("黄ストーンを追加",          self.add_yellow_stone_from_button)
         self.button_save             = self._push("画像のエクスポート",         self.save_fig)
+        self.button_copy             = self._push("画像をコピー",               self.copy_fig)
         self.button_import_img       = self._push("画像のインポート",           self.import_fig)
         self.button_export_stones    = self._push("ストーン配置のエクスポート", self.export_stones)
         self.button_import_stones    = self._push("ストーン配置のインポート",   self.import_stones)
@@ -76,7 +77,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.sheet)
         layout.addWidget(self.button_change_color)
         layout.addLayout(self._hbox([self.button_add_red_stone, self.button_add_yellow_stone]))
-        layout.addLayout(self._hbox([self.button_save, self.button_import_img]))
+        layout.addLayout(self._hbox([self.button_save, self.button_copy, self.button_import_img]))
         layout.addWidget(self.button_export_stones)
         layout.addWidget(self.button_import_stones)
         layout.addWidget(self.button_clear_stones)
@@ -162,6 +163,24 @@ class MainWindow(QWidget):
                                               "output.png", "PNG画像 (*.png)")
         if path:
             self.sheet.grab().save(path)
+
+    def copy_fig(self) -> None:
+        """シートの現在の表示画像をクリップボードへコピーする。
+
+        ファイルに保存する ``save_fig`` と同じく ``self.sheet.grab()`` で
+        シートを QPixmap として取得し、それをOSのクリップボードに渡す。
+        これにより、保存ファイルを介さずに資料・スライドへ直接貼り付けできる。
+
+        Returns:
+            None
+        """
+        # grab() でシート部分のスクリーンショット(QPixmap)を取得する
+        pixmap = self.sheet.grab()
+        # アプリ共通のクリップボードオブジェクトを取得する。
+        # QApplication が未起動などの場合は None が返り得るためガードする。
+        clipboard = QApplication.clipboard()
+        if clipboard is not None:
+            clipboard.setPixmap(pixmap)
 
     def import_fig(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "画像のインポート",
