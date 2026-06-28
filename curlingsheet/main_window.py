@@ -3,7 +3,8 @@ from PyQt6.QtWidgets import (QWidget, QPushButton, QRadioButton, QButtonGroup,
                               QVBoxLayout, QHBoxLayout, QFileDialog,
                               QGroupBox, QCheckBox, QDialog, QToolButton, QMenu,
                               QLabel, QApplication)
-from PyQt6.QtGui import QImage, QIcon, QAction
+from PyQt6.QtGui import QImage, QIcon, QAction, QCloseEvent
+from PyQt6.QtCore import Qt
 import cv2
 import numpy as np
 import pandas as pd
@@ -38,6 +39,10 @@ class MainWindow(QWidget):
 
         self.button_normal = self._radio("4人制", self.normal_rules)
         self.button_md     = self._radio("MD",    self.md_rules)
+        # 既にMD選択中にもう一度MDを押したときは toggled が発火しない
+        # (状態が変わらないため)。clicked を併用し、閉じた詳細ウィンドウを
+        # 再度開けるようにする。
+        self.button_md.clicked.connect(self.show_detail)
         self.button_3b = self._radio("3b", self.set_3b)
         self.button_3f = self._radio("3f", self.set_3f)
         self.button_2b = self._radio("2b", self.set_2b)
@@ -63,7 +68,13 @@ class MainWindow(QWidget):
         self.button_hammer = self._tool_button()
         rule_buttons.append(self.button_hammer)
 
-        self.detail = QGroupBox("MDの詳細設定")
+        # MDの詳細設定は独立した非モーダルウィンドウにする。
+        # Qt.WindowType.Window を親付きで指定すると、メインの上に重ならず
+        # 別ウィンドウとして表示でき、かつメイン側も操作し続けられる
+        # (非モーダル)。設定を変えながらシートの結果を確認できる。
+        self.detail = QWidget(self, Qt.WindowType.Window)
+        self.detail.setWindowTitle("MDの詳細設定")
+        self.detail.setWindowIcon(QIcon(icon_path))
         detail_layout = QVBoxLayout()
         detail_layout.addLayout(self._hbox([self.button_ppl, self.button_ppr]))
         detail_layout.addWidget(QLabel("初期配置 (b: 後  f: 前)"))
@@ -71,18 +82,54 @@ class MainWindow(QWidget):
         self.detail.setLayout(detail_layout)
         self.detail.setVisible(False)
 
-        layout = QVBoxLayout()
-        layout.addLayout(self._hbox(rule_buttons))
-        layout.addWidget(self.detail)
-        layout.addWidget(self.sheet)
-        layout.addWidget(self.button_change_color)
-        layout.addLayout(self._hbox([self.button_add_red_stone, self.button_add_yellow_stone]))
-        layout.addLayout(self._hbox([self.button_save, self.button_copy, self.button_import_img]))
-        layout.addWidget(self.button_export_stones)
-        layout.addWidget(self.button_import_stones)
-        layout.addWidget(self.button_clear_stones)
-        layout.addLayout(self._hbox([self.button_pochi, self.button_frame]))
-        layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetFixedSize)
+        # 左カラム: シート本体のみ(表示専用)。
+        # ルール選択や詳細設定はすべて右カラム/別ウィンドウへ移し、
+        # 「左=表示 / 右=操作」と役割を分離した。
+        left = QVBoxLayout()
+        left.addWidget(self.sheet)
+        left.addStretch()  # シートを上寄せにし、余白を下に集める
+
+        # 右カラム: 各種操作ボタンを機能ごとにグループ化して縦に並べる。
+        # 以前はシートの下に縦積みしていたため全体が縦長(約945px)になっていたが、
+        # シート横の余白に寄せることでウィンドウ高さをシート(600px)程度に抑える。
+        # 各グループの間に addStretch を入れ、シート高さいっぱいに均等に散らす。
+        group_rule = self._groupbox("ルール", [
+            self._hbox(rule_buttons),
+        ])
+        group_stone = self._groupbox("ストーン操作", [
+            self._hbox([self.button_add_red_stone, self.button_add_yellow_stone]),
+            self.button_clear_stones,
+        ])
+        group_image = self._groupbox("画像", [
+            self.button_save,
+            self.button_copy,
+            self.button_import_img,
+        ])
+        group_data = self._groupbox("ストーン配置データ", [
+            self.button_export_stones,
+            self.button_import_stones,
+        ])
+        group_view = self._groupbox("表示設定", [
+            self.button_change_color,
+            self._hbox([self.button_pochi, self.button_frame]),
+        ])
+
+        right = QVBoxLayout()
+        right.addWidget(group_rule)
+        right.addStretch()
+        right.addWidget(group_stone)
+        right.addStretch()
+        right.addWidget(group_image)
+        right.addStretch()
+        right.addWidget(group_data)
+        right.addStretch()
+        right.addWidget(group_view)
+
+        # 左右カラムを横並びに配置する
+        layout = QHBoxLayout()
+        layout.addLayout(left)
+        layout.addLayout(right)
+        layout.setSizeConstraint(QHBoxLayout.SizeConstraint.SetFixedSize)
         self.setLayout(layout)
 
         self.sheet.clear_stones()
@@ -90,6 +137,9 @@ class MainWindow(QWidget):
     def _push(self, title, method) -> QPushButton:
         btn = QPushButton(title)
         btn.clicked.connect(method)
+        # 右カラムのボタンが縦に細くならないよう最低高さを確保し、
+        # グループ間の余白とあわせて見た目のバランスを整える。
+        btn.setMinimumHeight(40)
         return btn
 
     def _radio(self, title, method) -> QRadioButton:
@@ -113,6 +163,31 @@ class MainWindow(QWidget):
         for w in widgets:
             layout.addWidget(w)
         return layout
+
+    def _groupbox(self, title: str, rows: list) -> QGroupBox:
+        """見出し付きの枠(QGroupBox)に行を縦に並べて返す。
+
+        右カラムのボタン群を機能ごとにまとめて視認性を上げるために使う。
+
+        Args:
+            title: グループ枠の見出しテキスト。
+            rows: 枠内に上から並べる要素のリスト。各要素は
+                ウィジェット(QWidget)単体、またはレイアウト(QLayout)を受け付ける。
+                レイアウトを渡すと ``_hbox`` で作った横並びをそのまま1行にできる。
+
+        Returns:
+            行を縦に積んだ QGroupBox。
+        """
+        box    = QGroupBox(title)
+        vbox   = QVBoxLayout()
+        for row in rows:
+            # ウィジェットとレイアウトで追加メソッドが異なるため振り分ける
+            if isinstance(row, QWidget):
+                vbox.addWidget(row)
+            else:
+                vbox.addLayout(row)
+        box.setLayout(vbox)
+        return box
 
     def _tool_button(self) -> QToolButton:
         btn  = QToolButton()
@@ -224,10 +299,33 @@ class MainWindow(QWidget):
             self.sheet.clear_stones()
 
     def md_rules(self, checked) -> None:
-        self.detail.setVisible(checked)
         if checked:
             self.sheet.is_MD = True
             self.sheet.init_MD()
+            self.show_detail()
+        else:
+            # MD以外を選んだら詳細設定ウィンドウは閉じる
+            self.detail.hide()
+
+    def show_detail(self) -> None:
+        """MD詳細設定ウィンドウをメインウィンドウに重ねて表示する。
+
+        MD選択時、および既にMD選択中にMDボタンを再クリックしたときに
+        呼ばれる。メインウィンドウの左上から少し内側にずらして配置し、
+        手前に重ねて表示する。MD以外を選択中は何もしない。
+
+        Returns:
+            None
+        """
+        # MD以外を選んでいるときは詳細設定を開かない
+        if not self.button_md.isChecked():
+            return
+        # メインウィンドウの左上から少し内側にずらして重ねて表示する
+        geom = self.geometry()
+        self.detail.move(geom.x() + 40, geom.y() + 40)
+        self.detail.show()
+        self.detail.raise_()           # 他ウィンドウより手前に出す
+        self.detail.activateWindow()   # フォーカスを与える
 
     def set_ppl(self, checked) -> None:
         self.sheet.is_PPL = checked
@@ -264,3 +362,18 @@ class MainWindow(QWidget):
 
     def toggle_frame(self, checked) -> None:
         self.sheet.show_frame = checked
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        """メインウィンドウを閉じる際の処理。
+
+        MD詳細設定は別ウィンドウのため、メインを閉じても残ってしまう
+        ことがある。アプリ全体が確実に終了するよう明示的に閉じる。
+
+        Args:
+            event: ウィンドウのクローズイベント。
+
+        Returns:
+            None
+        """
+        self.detail.close()
+        super().closeEvent(event)
