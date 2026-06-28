@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-CENTER_X = 149
-HOUSEX   = 80
-HOUSEY   = 159
-FOOT8    = 120
+CENTER_X    = 149
+HOUSEX      = 80
+PP_Y_HAMMER = 168
+FOOT8       = 129
 
 # md_place -> (f_stone_y, pp_x_offset)
 # md_place: 5=3b, 4=3f, 3=2b, 2=2f, 1=1b, 0=1f
@@ -20,8 +20,8 @@ def get_md_stones(md_place: int, is_ppl: bool, is_ppr: bool,
                   f: int, l: int) -> list[tuple]:
     f_y, x_off = _PLACE[md_place]
     if is_ppl:
-        return [(CENTER_X - HOUSEX, HOUSEY, l), (CENTER_X - x_off, f_y, f)]
+        return [(CENTER_X - HOUSEX, PP_Y_HAMMER, l), (CENTER_X - x_off, f_y, f)]
     elif is_ppr:
-        return [(CENTER_X + HOUSEX, HOUSEY, l), (CENTER_X + x_off, f_y, f)]
+        return [(CENTER_X + HOUSEX, PP_Y_HAMMER, l), (CENTER_X + x_off, f_y, f)]
     else:
         return [(CENTER_X, FOOT8, l), (CENTER_X, f_y, f)]

@@ -112,6 +112,9 @@ class Sheet(QWidget):
                     new_y = max(r, min(new_y, h - r))
             if not overlap_found:
                 break
+        # メソッド冒頭(L66)で selected_stone が None の場合は早期returnしており、
+        # ここに到達する時点では必ず Stone インスタンスである。
+        assert self.selected_stone is not None
         self.selected_stone.x = new_x
         self.selected_stone.y = new_y
 
